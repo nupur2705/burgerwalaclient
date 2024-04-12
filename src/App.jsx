@@ -37,11 +37,12 @@ import Notfound from "./components/layout/Notfound";
 import { useEffect } from "react";
 import { loadUser } from "./redux/actions/user";
 import toast,{Toaster} from "react-hot-toast";
+import {ProtectedRoute} from "protected-route-react"
 
 
 function App() {
  const dispatch =useDispatch();
- const {error,message,isAuthenticated}=useSelector(
+ const {error,message,isAuthenticated,user}=useSelector(
   (state) => state.auth
 );
  useEffect(() => {
@@ -72,17 +73,39 @@ function App() {
         <Route path="/contact" element={<Contact/>}/>
         <Route path="/about" element={<About/>}/>
         <Route path="/cart" element={<Cart/>}/>
+        <Route path="/paymentsuccess" element={<PaymentSuccess/>}/>
+        <Route
+          path="/login"
+          element={
+            <ProtectedRoute isAuthenticated={!isAuthenticated} redirect="/me">
+              <Login />
+            </ProtectedRoute>
+          }
+        />
+        <Route element={<ProtectedRoute 
+        isAuthenticated={isAuthenticated}
+        
+        />}>
+        <Route path="/me" element={<Profile/>}/>
         <Route path="/shipping" element={<Shipping/>}/>
         <Route path="/confirmorder" element={<ConfirmOrder/>}/>
-        <Route path="/paymentsuccess" element={<PaymentSuccess/>}/>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/me" element={<Profile/>}/>
         <Route path="/myorders"element={<MyOrders/>}/>
         <Route path="/order/:id" element={<OrderDetails/>}/>
+        </Route>
+
+       
+        
+        <Route element={<ProtectedRoute 
+        isAuthenticated={isAuthenticated}
+        adminRoute={true}
+        isAdmin={ user && user.role==="admin"}
+        redirectAdmin="/me"
+        />}>
+        
         <Route path="/admin/dashboard" element={<Dashboard/>}/>
         <Route path="/admin/users" element={<Users/>}/>
         <Route path="/admin/orders" element={<Orders/>}/>
-        
+        </Route>
 
         <Route path="*" element={<Notfound/>}/>
       </Routes>
